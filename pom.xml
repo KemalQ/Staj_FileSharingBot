@@ -65,9 +65,6 @@
 				<groupId>org.liquibase</groupId>
 				<artifactId>liquibase-maven-plugin</artifactId>
 				<version>${liquibase.plugin.version}</version>
-				<configuration>
-					<propertyFile>liquibase.properties</propertyFile>
-				</configuration>
 			</plugin>
 		</plugins>
 	</build>
