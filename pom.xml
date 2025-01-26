@@ -19,8 +19,8 @@
 	<properties>
 		<java.version>11</java.version>
 		<liquibase.plugin.version>4.23.0</liquibase.plugin.version>
-		<lombok.version>1.18.24</lombok.version>
-		<telegrambot.starter.version>5.0.1</telegrambot.starter.version>
+		<lombok.version>1.18.22</lombok.version>
+		<telegrambot.starter.version>6.1.0</telegrambot.starter.version>
 	</properties>
 
 	<dependencies>

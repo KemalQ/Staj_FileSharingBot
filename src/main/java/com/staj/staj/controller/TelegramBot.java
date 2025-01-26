@@ -9,6 +9,8 @@ import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
+import javax.annotation.PostConstruct;
+
 
 @Component
 @Slf4j
@@ -16,9 +18,14 @@ public class TelegramBot extends TelegramLongPollingBot {
 
     @Value("${telegram.bot.username}")
     private String userName;
-
     @Value("${telegram.bot.token}")
     private String tokenName;
+    private UpdateController updateController;
+
+    @PostConstruct
+    public void init(){
+        updateController.registerBot(this);
+    }
 
     @Override
     public String getBotUsername() {
