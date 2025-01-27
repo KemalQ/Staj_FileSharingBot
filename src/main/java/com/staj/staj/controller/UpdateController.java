@@ -1,15 +1,21 @@
 package com.staj.staj.controller;
 
+import com.staj.staj.service.UpdateProducer;
 import com.staj.staj.utils.MessageUtils;
-import lombok.extern.log4j.Log4j;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
+
+import static com.last.RabbitQueue.*;
+
 @Component
-@Log4j
+@Slf4j
+
 public class UpdateController {
     private TelegramBot telegramBot;
-    private MessageUtils messageUtils;
+    private final MessageUtils messageUtils;
+    private  UpdateProducer updateProducer;
 
     public UpdateController(MessageUtils messageUtils) {
         this.messageUtils = messageUtils;
@@ -25,9 +31,8 @@ public class UpdateController {
         }
         if (update.getMessage() != null){
             distributeMessagesByType(update);
-        }
-        else {
-            log.error("Received unsupported message type" + update);
+        } else {
+            log.error("Unsupported message type is:  {}" , update);
         }
     }
     private void distributeMessagesByType(Update update) {
@@ -43,19 +48,28 @@ public class UpdateController {
         }
     }
 
-    private void processDocMessage(Update update) {
-    }
-
-    private void processPhotoMessage(Update update) {
-    }
-    private void processTextMessage(Update update) {
-    }
     private void setUnsupportedMessageTypeView(Update update) {
-        var sendMessage = messageUtils.generateSendMessageWithText(update, "Unsupported message type");
+        var sendMessage = messageUtils.generateSendMessageWithText(update, "Unsupported message type!");
         setView(sendMessage);
     }
-
+    private void setFileReceived(Update update) {
+        var sendMessage = messageUtils.generateSendMessageWithText(update,
+                "File received! Loadind...");
+        setView(sendMessage);
+    }
     private void setView(SendMessage sendMessage) {
         telegramBot.sendAnswerMessage(sendMessage);
     }
+    private void processPhotoMessage(Update update) {
+        updateProducer.produce(PHOTO_MESSAGE_UPDATE, update);
+        setFileReceived(update);
+    }
+    private void processDocMessage(Update update) {
+        updateProducer.produce(DOC_MESSAGE_UPDATE, update);
+    }
+    private void processTextMessage(Update update) {
+        updateProducer.produce(TEXT_MESSAGE_UPDATE, update);
+    }
+
+
 }
