@@ -12,13 +12,14 @@ import static com.staj.staj.module.RabbitQueue.*;
 
 @Component
 @Slf4j
-
-public class UpdateController {
-    private TelegramBot telegramBot;
+public class UpdateController {//для разных типов сообщений буду
+    // передавать разный набор входящих параметров в этот сервис
+    private TelegramBot telegramBot;//соединение UpdateController с TelegramBot
     private final MessageUtils messageUtils;
     private  UpdateProducer updateProducer;
 
-    public UpdateController(MessageUtils messageUtils) {
+    public UpdateController(MessageUtils messageUtils, UpdateProducer updateProducer) {
+        this.updateProducer = updateProducer;
         this.messageUtils = messageUtils;
     }
     public void registerBot(TelegramBot telegramBot) {
@@ -53,17 +54,17 @@ public class UpdateController {
         var sendMessage = messageUtils.generateSendMessageWithText(update, "Unsupported message type!");
         setView(sendMessage);
     }
-    private void setFileReceived(Update update) {
+    private void setFileReceivedView(Update update) {
         var sendMessage = messageUtils.generateSendMessageWithText(update,
                 "File received! Loadind...");
         setView(sendMessage);
     }
-    private void setView(SendMessage sendMessage) {
+    public void setView(SendMessage sendMessage) {
         telegramBot.sendAnswerMessage(sendMessage);
     }
     private void processPhotoMessage(Update update) {
         updateProducer.produce(PHOTO_MESSAGE_UPDATE, update);
-        setFileReceived(update);
+        setFileReceivedView(update);
     }
     private void processDocMessage(Update update) {
         updateProducer.produce(DOC_MESSAGE_UPDATE, update);
