@@ -9,10 +9,10 @@ import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import static com.staj.staj.module.RabbitQueue.ANSWER_MESSAGE;
 
 @Service
-public class AnswerServiceImpl implements AnswerConsumer {
+public class AnswerConsumerImpl implements AnswerConsumer {
     private final UpdateController updateController;
 
-    public AnswerServiceImpl(UpdateController updateController) {
+    public AnswerConsumerImpl(UpdateController updateController) {
         this.updateController = updateController;
     }
 
