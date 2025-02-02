@@ -1,4 +1,4 @@
-package com.staj.staj.entity;
+package com.staj.staj.Node.entity;
 
 import com.vladmihalcea.hibernate.type.json.JsonBinaryType;
 import lombok.*;
