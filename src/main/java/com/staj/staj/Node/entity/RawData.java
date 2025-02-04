@@ -15,7 +15,10 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 import java.util.Objects;
 
-@Data
+//@Data
+@Setter
+@Getter
+@EqualsAndHashCode(exclude = "id")//исключение для id, при генерации G&S значение id учитываться не будут
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor

@@ -28,8 +28,8 @@ public class MainServiceImpl implements MainService {
         producerService.producerAnswer(sendMessage);
     }
 
-    private void saveRawData(Update update) {
+    private void saveRawData(Update update) {//storing to hash collection
         RawData rawData = RawData.builder().event(update).build();//из за неправильного импорта в RawData .event не распознается
-        rawDataDAO.save(rawData);
+        rawDataDAO.save(rawData);//storing to DB and setting id
     }
 }
