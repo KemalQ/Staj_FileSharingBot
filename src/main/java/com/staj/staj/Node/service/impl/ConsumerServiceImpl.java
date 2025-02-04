@@ -2,11 +2,9 @@ package com.staj.staj.Node.service.impl;
 
 import com.staj.staj.Node.service.ConsumerService;
 import com.staj.staj.Node.service.MainService;
-import com.staj.staj.Node.service.ProducerService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.stereotype.Service;
-import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 
 import static com.staj.staj.module.RabbitQueue.*;
@@ -22,6 +20,7 @@ public class ConsumerServiceImpl implements ConsumerService {
     @RabbitListener(queues= TEXT_MESSAGE_UPDATE)
     public void consumeTextMessageUpdates(Update update) {
         log.debug("NODE: Text message is received");
+        mainService.processTextMessage(update);
     }
 
     @Override
