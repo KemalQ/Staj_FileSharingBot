@@ -2,6 +2,7 @@ package com.staj.staj.Node.service.impl;
 
 import com.staj.staj.Node.service.ConsumerService;
 import com.staj.staj.Node.service.MainService;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.stereotype.Service;
@@ -11,11 +12,9 @@ import static com.staj.staj.module.RabbitQueue.*;
 
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class ConsumerServiceImpl implements ConsumerService {
     private final MainService mainService;
-    public ConsumerServiceImpl(MainService mainService){
-        this.mainService = mainService;
-    }
     @Override
     @RabbitListener(queues= TEXT_MESSAGE_UPDATE)
     public void consumeTextMessageUpdates(Update update) {

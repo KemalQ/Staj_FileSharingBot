@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.telegram.telegrambots.meta.api.objects.Document;
 import org.telegram.telegrambots.meta.api.objects.Message;
+import org.telegram.telegrambots.meta.api.objects.PhotoSize;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -43,28 +44,46 @@ public class FileServiceImpl implements FileService {
 
     @Override
     public AppDocument processDoc(Message telegramMessage) {
-        String fileId = telegramMessage.getDocument().getFileId();
+        if(telegramMessage.getDocument() == null) {
+            return null;
+        }
+        Document telegramDoc = telegramMessage.getDocument();
+        String fileId = telegramDoc.getFileId();
         ResponseEntity<String> response = getFilePath(fileId);
         if (response.getStatusCode() == HttpStatus.OK){
-            JSONObject jsonObject = new JSONObject(response.getBody());
-            String filePath = String.valueOf(jsonObject.getJSONObject("result").getString("file_path"));
-            byte[] fileInByte = downloadFile(filePath);//запрос к серверу телеги, скачка в виде бат
-            BinaryContent transientBinaryContent = BinaryContent.
-                    builder().fileAsArrayOfBytes(fileInByte).build();
-            BinaryContent persistentBinaryContent = binaryContentDAO.save(transientBinaryContent);
-            Document telegramDoc = telegramMessage.getDocument();
+            BinaryContent persistentBinaryContent = getPersistentBinaryContent(response);
             AppDocument transientAppDoc = buildTransientAppDoc(telegramDoc, persistentBinaryContent);
             return appDocumentDAO.save(transientAppDoc);
         } else {
             throw new UploadFileException("Bad response from telegram service: " + response);
         }
     }
-
     @Override
     public AppPhoto processPhoto(Message telegramMessage) {
-        return null;
+        //TODO пока что обрабатываем только одно сообщение
+        PhotoSize telegramPhoto = telegramMessage.getPhoto().get(0);
+        String fileId = telegramPhoto.getFileId();
+        ResponseEntity<String> response = getFilePath(fileId);
+        if (response.getStatusCode() == HttpStatus.OK){
+            BinaryContent persistentBinaryContent = getPersistentBinaryContent(response);
+            AppPhoto transientAppDoc = buildTransientAppPhoto(telegramPhoto, persistentBinaryContent);
+            return appPhotoDAO.save(transientAppDoc);
+        } else {
+            throw new UploadFileException("Bad response from telegram service: " + response);
+        }
+    }
+    private BinaryContent getPersistentBinaryContent(ResponseEntity<String> response) {
+        String filePath = getFilePath(response);
+        byte[] fileInByte = downloadFile(filePath);//запрос к серверу телеги, скачка в виде байт
+        BinaryContent transientBinaryContent = BinaryContent.
+                builder().fileAsArrayOfBytes(fileInByte).build();
+        return binaryContentDAO.save(transientBinaryContent);
     }
 
+    private String getFilePath(ResponseEntity<String> response) {
+        JSONObject jsonObject = new JSONObject(response.getBody());
+        return String.valueOf(jsonObject.getJSONObject("result").getString("file_path"));
+    }
     private AppDocument buildTransientAppDoc(Document telegramDoc, BinaryContent persistentBinaryContent) {
         return AppDocument.builder()//достает значения из полей телеграмовского объекта документа и сетить их в наш объект
                 .telegramFieldId(telegramDoc.getFileId())
@@ -72,6 +91,13 @@ public class FileServiceImpl implements FileService {
                 .binaryContent(persistentBinaryContent)
                 .mimeType(telegramDoc.getMimeType())
                 .fileSize(telegramDoc.getFileSize())
+                .build();
+    }
+    private AppPhoto buildTransientAppPhoto(PhotoSize telegramPhoto, BinaryContent persistentBinaryContent) {
+        return AppPhoto.builder()//достает значения из полей телеграмовского объекта документа и сетить их в наш объект
+                .telegramFieldId(telegramPhoto.getFileId())
+                .binaryContent(persistentBinaryContent)
+                .fileSize(telegramPhoto.getFileSize())
                 .build();
     }
     private ResponseEntity<String> getFilePath(String fileId) {

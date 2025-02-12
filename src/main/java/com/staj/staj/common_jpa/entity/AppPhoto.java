@@ -16,5 +16,5 @@ public class AppPhoto {
     private String telegramFieldId;
     @OneToOne
     private BinaryContent binaryContent;//ссылка на объект BinaryContent
-    private Long fileSize;
+    private  Integer fileSize;
 }

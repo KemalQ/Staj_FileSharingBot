@@ -9,6 +9,7 @@ import com.staj.staj.Node.service.MainService;
 import com.staj.staj.Node.service.enums.ServiceCommand;
 import com.staj.staj.common_jpa.dao.AppUserDAO;
 import com.staj.staj.common_jpa.entity.AppDocument;
+import com.staj.staj.common_jpa.entity.AppPhoto;
 import com.staj.staj.common_jpa.entity.AppUser;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -104,10 +105,17 @@ public class MainServiceImpl implements MainService {
         if (isNotAllowToSendContent(chatId, appUser)) {
             return;
         }
-        //TODO добавить сохранения фото
-        var answer = "Фото успешно загружено! " +
-                "Ссылка для скачивания: http://test.ru/get-photo//777";
-        sendAnswer(answer, chatId);
+        try{
+            AppPhoto photo = fileService.processPhoto(update.getMessage());
+            //TODO добавить генерацию ссылки для скачивания фото
+            var answer = "Фото успешно загружено! " +
+                    "Ссылка для скачивания: http://test.ru/get-photo//777";
+            sendAnswer(answer, chatId);
+        } catch (UploadFileException ex) {
+            log.error("Ошибка при загрузке фото", ex);
+            String error = "К сожалению, загрузка фото не удалась. Повторите попытку позже.";
+            sendAnswer(error, chatId);
+        }
     }
 
     private String processServiceCommand(AppUser appUser, String cmd){
