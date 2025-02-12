@@ -25,11 +25,11 @@ import java.net.URL;
 @Slf4j
 @Service
 public class FileServiceImpl implements FileService {
-    @Value("?{token}")
+    @Value("${telegram.bot.token}")
     private String token;
-    @Value("?{service.file_info.uri}")
+    @Value("${service.file_info.uri}")
     private String fileInfoUri;
-    @Value("?{service.file_storage.uri}")
+    @Value("${service.file_storage.uri}")
     private String fileStorageUri;
     private final AppDocumentDAO appDocumentDAO;
     private final BinaryContentDAO binaryContentDAO;
