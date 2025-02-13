@@ -105,7 +105,7 @@ public class MainServiceImpl implements MainService {
         if (isNotAllowToSendContent(chatId, appUser)) {
             return;
         }
-        try{
+        try{//передал message из вход. Update в fileService
             AppPhoto photo = fileService.processPhoto(update.getMessage());
             //TODO добавить генерацию ссылки для скачивания фото
             var answer = "Фото успешно загружено! " +

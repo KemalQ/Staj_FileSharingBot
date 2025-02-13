@@ -34,14 +34,13 @@ public class FileServiceImpl implements FileService {
     private String fileStorageUri;
     private final AppDocumentDAO appDocumentDAO;
     private final BinaryContentDAO binaryContentDAO;
-    private final AppPhotoDAO appPhotoDAO;
+    private final AppPhotoDAO appPhotoDAO;//bean для сохранения объекта фото в базу
 
     public FileServiceImpl(AppDocumentDAO appDocumentDAO, BinaryContentDAO binaryContentDAO, AppPhotoDAO appPhotoDAO) {
         this.appDocumentDAO = appDocumentDAO;
         this.binaryContentDAO = binaryContentDAO;
         this.appPhotoDAO = appPhotoDAO;
     }
-
     @Override
     public AppDocument processDoc(Message telegramMessage) {
         if(telegramMessage.getDocument() == null) {
@@ -62,30 +61,35 @@ public class FileServiceImpl implements FileService {
     public AppPhoto processPhoto(Message telegramMessage) {
         //TODO пока что обрабатываем только одно сообщение
         PhotoSize telegramPhoto = telegramMessage.getPhoto().get(0);
-        String fileId = telegramPhoto.getFileId();
-        ResponseEntity<String> response = getFilePath(fileId);
-        if (response.getStatusCode() == HttpStatus.OK){
-            BinaryContent persistentBinaryContent = getPersistentBinaryContent(response);
+        String fileId = telegramPhoto.getFileId();// Получаем уникальный идентификатор файла в Telegram
+        ResponseEntity<String> response = getFilePath(fileId);// Делаем запрос к API Telegram, чтобы получить путь к файлу
+        if (response.getStatusCode() == HttpStatus.OK){// Проверяем успешность ответа
+            BinaryContent persistentBinaryContent = getPersistentBinaryContent(response);// Получаем и сохраняем бинарное содержимое файла
+            // Создаем объект AppPhoto с данными из Telegram и сохраненным содержимым
             AppPhoto transientAppDoc = buildTransientAppPhoto(telegramPhoto, persistentBinaryContent);
-            return appPhotoDAO.save(transientAppDoc);
+            return appPhotoDAO.save(transientAppDoc);// Сохраняем фото в базу данных и возвращаем сохраненный объект
         } else {
             throw new UploadFileException("Bad response from telegram service: " + response);
         }
     }
     private BinaryContent getPersistentBinaryContent(ResponseEntity<String> response) {
-        String filePath = getFilePath(response);
+        String filePath = getFilePath(response);//получение пути из
         byte[] fileInByte = downloadFile(filePath);//запрос к серверу телеги, скачка в виде байт
-        BinaryContent transientBinaryContent = BinaryContent.
+        BinaryContent transientBinaryContent = BinaryContent.//через builder-build создается объект класса BinaryContent
                 builder().fileAsArrayOfBytes(fileInByte).build();
-        return binaryContentDAO.save(transientBinaryContent);
+        return binaryContentDAO.save(transientBinaryContent);//сохраняем-возвращаем этот объект в таблице "binary_content"
     }
 
     private String getFilePath(ResponseEntity<String> response) {
-        JSONObject jsonObject = new JSONObject(response.getBody());
-        return String.valueOf(jsonObject.getJSONObject("result").getString("file_path"));
+        JSONObject jsonObject = new JSONObject(response.getBody());//Создаем JSON объект из тела ответа
+
+
+        return String.valueOf(jsonObject. //Извлекаем значение file_path из вложенного объекта result
+                getJSONObject("result").// и преобразуем его в строку
+                getString("file_path"));
     }
     private AppDocument buildTransientAppDoc(Document telegramDoc, BinaryContent persistentBinaryContent) {
-        return AppDocument.builder()//достает значения из полей телеграмовского объекта документа и сетить их в наш объект
+        return AppDocument.builder()//достает значения из полей телеграмовского объекта документа и сетит их в наш объект
                 .telegramFieldId(telegramDoc.getFileId())
                 .docName(telegramDoc.getFileName())
                 .binaryContent(persistentBinaryContent)
@@ -95,9 +99,9 @@ public class FileServiceImpl implements FileService {
     }
     private AppPhoto buildTransientAppPhoto(PhotoSize telegramPhoto, BinaryContent persistentBinaryContent) {
         return AppPhoto.builder()//достает значения из полей телеграмовского объекта документа и сетить их в наш объект
-                .telegramFieldId(telegramPhoto.getFileId())
-                .binaryContent(persistentBinaryContent)
-                .fileSize(telegramPhoto.getFileSize())
+                .telegramFiledId(telegramPhoto.getFileId())//установка id файла, полученный из Telegram
+                .binaryContent(persistentBinaryContent)// Установка бинарное содержимое файла
+                .fileSize(telegramPhoto.getFileSize())// Установка размера файла из данных Telegram
                 .build();
     }
     private ResponseEntity<String> getFilePath(String fileId) {
@@ -111,7 +115,7 @@ public class FileServiceImpl implements FileService {
     private byte[] downloadFile(String filePath) {
         var fullUri = fileStorageUri.replace("{token}", token)
                 .replace("{filePath}", filePath);
-        URL urlObj = null;
+        URL urlObj = null;//сначала null, потом -переопределил
         try {
             urlObj = new URL(fullUri);
         } catch (MalformedURLException e) {

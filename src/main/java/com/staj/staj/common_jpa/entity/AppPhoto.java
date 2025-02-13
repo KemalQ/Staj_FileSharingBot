@@ -4,6 +4,7 @@ import lombok.*;
 import javax.persistence.*;
 @Getter
 @Setter
+@EqualsAndHashCode(exclude = "id")
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
@@ -13,8 +14,8 @@ public class AppPhoto {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private String telegramFieldId;
+    private String telegramFiledId;
     @OneToOne
     private BinaryContent binaryContent;//ссылка на объект BinaryContent
-    private  Integer fileSize;
+    private Integer fileSize;
 }
