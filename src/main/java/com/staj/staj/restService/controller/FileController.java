@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController//чтобы спринг не искал в ресурсах шаблон страницы view
 public class FileController {
     //localhost:8080/file/get-doc?id=3
+    //localhost:8080/file/get-photo?id=1
     private final FileServiceRest fileService;
 
     public FileController(FileServiceRest fileService) {

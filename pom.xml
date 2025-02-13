@@ -25,6 +25,7 @@
 		<telegrambot.starter.version>6.1.0</telegrambot.starter.version>
 		<postgresql.version>42.2.18</postgresql.version>
 		<hibernate-types.version>2.2.2</hibernate-types.version>
+		<hashids.version>1.0.1</hashids.version>
 	</properties>
 
 	<dependencies>
@@ -78,6 +79,11 @@
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-amqp</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.hashids</groupId>
+			<artifactId>hashids</artifactId>
+			<version>${hashids.version}</version>
 		</dependency>
 	</dependencies>
 

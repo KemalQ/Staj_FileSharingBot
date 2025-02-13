@@ -59,8 +59,10 @@ public class FileServiceImpl implements FileService {
     }
     @Override
     public AppPhoto processPhoto(Message telegramMessage) {
-        //TODO пока что обрабатываем только одно сообщение
-        PhotoSize telegramPhoto = telegramMessage.getPhoto().get(0);
+        //TODO telega позволяет скачать фото в нескольких разрегшениях, поэтому указал последний объект
+        var photoSizeCount = telegramMessage.getPhoto().size();
+        var photoIndex = photoSizeCount >1 ? telegramMessage.getPhoto().size() -1 : 0;
+        PhotoSize telegramPhoto = telegramMessage.getPhoto().get(photoIndex);//TODO тут
         String fileId = telegramPhoto.getFileId();// Получаем уникальный идентификатор файла в Telegram
         ResponseEntity<String> response = getFilePath(fileId);// Делаем запрос к API Telegram, чтобы получить путь к файлу
         if (response.getStatusCode() == HttpStatus.OK){// Проверяем успешность ответа
