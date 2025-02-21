@@ -2,6 +2,8 @@ package com.staj.staj.Node.service.impl;
 
 import com.staj.staj.Node.exceptions.UploadFileException;
 import com.staj.staj.Node.service.FileService;
+import com.staj.staj.Node.service.enums.LinkType;
+import com.staj.staj.commonUtils.utils.CryptoTool;
 import com.staj.staj.common_jpa.dao.AppDocumentDAO;
 import com.staj.staj.common_jpa.dao.AppPhotoDAO;
 import com.staj.staj.common_jpa.dao.BinaryContentDAO;
@@ -32,14 +34,18 @@ public class FileServiceImpl implements FileService {
     private String fileInfoUri;
     @Value("${service.file_storage.uri}")
     private String fileStorageUri;
+    @Value("${link.address}")
+    private String linkAddress;
     private final AppDocumentDAO appDocumentDAO;
     private final BinaryContentDAO binaryContentDAO;
     private final AppPhotoDAO appPhotoDAO;//bean для сохранения объекта фото в базу
+    private final CryptoTool cryptoTool;
 
-    public FileServiceImpl(AppDocumentDAO appDocumentDAO, BinaryContentDAO binaryContentDAO, AppPhotoDAO appPhotoDAO) {
+    public FileServiceImpl(AppDocumentDAO appDocumentDAO, BinaryContentDAO binaryContentDAO, AppPhotoDAO appPhotoDAO, CryptoTool cryptoTool) {
         this.appDocumentDAO = appDocumentDAO;
         this.binaryContentDAO = binaryContentDAO;
         this.appPhotoDAO = appPhotoDAO;
+        this.cryptoTool = cryptoTool;
     }
     @Override
     public AppDocument processDoc(Message telegramMessage) {
@@ -130,5 +136,10 @@ public class FileServiceImpl implements FileService {
         } catch (IOException e) {
             throw new UploadFileException(urlObj.toExternalForm(), e);
         }
+    }
+    @Override
+    public String generateLink(Long docId, LinkType linkType) {
+        var hash = cryptoTool.hashOf(docId);
+        return "http://" + linkAddress + "/" + linkType + "?id=" + hash;
     }
 }

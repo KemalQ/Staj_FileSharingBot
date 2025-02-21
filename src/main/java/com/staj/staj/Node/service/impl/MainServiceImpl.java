@@ -6,6 +6,7 @@ import com.staj.staj.Node.service.ProducerService;
 import com.staj.staj.Node.dao.RawDataDAO;
 import com.staj.staj.Node.entity.RawData;
 import com.staj.staj.Node.service.MainService;
+import com.staj.staj.Node.service.enums.LinkType;
 import com.staj.staj.Node.service.enums.ServiceCommand;
 import com.staj.staj.common_jpa.dao.AppUserDAO;
 import com.staj.staj.common_jpa.entity.AppDocument;
@@ -72,8 +73,8 @@ public class MainServiceImpl implements MainService {
         }
         try{
             AppDocument doc = fileService.processDoc(update.getMessage());
-            //TODO Добавить генерацию ссылки для скачивания документа
-            var answer = "Документ успешно загружен! ссыдка для скачивания: http://test.ru/get-doc//777";
+            String link = fileService.generateLink(doc.getId(), LinkType.GET_DOC);//Добавил генерацию ссылки для скачивания документа
+            var answer = "Документ успешно загружен! ссыдка для скачивания: " + link;
             sendAnswer(answer, chatId);
         } catch (UploadFileException ex) {
             log.error("Ошибка при загрузке файла", ex);
@@ -107,9 +108,9 @@ public class MainServiceImpl implements MainService {
         }
         try{//передал message из вход. Update в fileService
             AppPhoto photo = fileService.processPhoto(update.getMessage());
-            //TODO добавить генерацию ссылки для скачивания фото
+            String link = fileService.generateLink(photo.getId(), LinkType.GET_PHOTO);//Добавил генерацию ссылки для скачивания фото
             var answer = "Фото успешно загружено! " +
-                    "Ссылка для скачивания: http://test.ru/get-photo//777";
+                    "Ссылка для скачивания: " + link;
             sendAnswer(answer, chatId);
         } catch (UploadFileException ex) {
             log.error("Ошибка при загрузке фото", ex);

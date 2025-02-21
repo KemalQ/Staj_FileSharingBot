@@ -7,7 +7,7 @@ public class CryptoTool {
 
     public CryptoTool(String salt) {
         var minHashLength = 10;
-        this.hashids = new Hashids(salt, minHashLength);
+        this.hashids = new Hashids(salt, minHashLength);//использовал перем. чтобы предотвратить magic number
     }
 
     public String hashOf(Long value){//делает хеш

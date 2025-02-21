@@ -24,7 +24,7 @@ public class FileController {
     public ResponseEntity<?> getDoc(@RequestParam("id") String id){
         //TODO для формирования badRequest добавить ControllerAdvice
         var doc = fileService.getDocument(id);
-        if (doc == null) {
+        if (doc == null) {//400 ответ если возникла ощибка в id
             return ResponseEntity.badRequest().build();
         }
         var binaryContent = doc.getBinaryContent();
@@ -33,8 +33,9 @@ public class FileController {
             return ResponseEntity.internalServerError().build();
         }
         return ResponseEntity.ok()
-                .contentType(MediaType.parseMediaType(doc.getMimeType()))
+                .contentType(MediaType.parseMediaType(doc.getMimeType()))//браузер из потока byte созд. файл с нужным расширением
                 .header("Content-Disposition", "attachment; filename=" + doc.getDocName())
+                //header-указывает как воспринимать получ инф., attachment-чтобы бр скачал файл
                 .body(fileSystemResource);
     }
 
@@ -52,7 +53,7 @@ public class FileController {
         }
         return ResponseEntity.ok()
                 .contentType(MediaType.IMAGE_JPEG)
-                .header("Content-Disposition", "attachment;")
+                .header("Content-Disposition", "attachment;")//telega не хранит имя фото?
                 .body(fileSystemResource);
     }
 }
