@@ -1,6 +1,6 @@
 package com.staj.staj.mailService.controller;
 
-import com.staj.staj.mailService.dto.MailParams;
+import com.staj.staj.commonUtils.dto.MailParams;
 import com.staj.staj.mailService.service.MailSenderService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-@RequestMapping(value ="/mail")
+@RequestMapping(value ="/user")
 @RestController
 public class MailController {
     private final MailSenderService mailSenderService;

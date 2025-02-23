@@ -1,6 +1,6 @@
 package com.staj.staj.mailService.service.impl;
 
-import com.staj.staj.mailService.dto.MailParams;
+import com.staj.staj.commonUtils.dto.MailParams;
 import com.staj.staj.mailService.service.MailSenderService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.SimpleMailMessage;

@@ -21,7 +21,7 @@ public class FileController {
         this.fileService = fileService;
     }
     @RequestMapping(method = RequestMethod.GET, value = "/get-doc")
-    public ResponseEntity<?> getDoc(@RequestParam("id") String id){
+    public ResponseEntity<?> getDoc(@RequestParam("id") Long id){
         //TODO для формирования badRequest добавить ControllerAdvice
         var doc = fileService.getDocument(id);
         if (doc == null) {//400 ответ если возникла ощибка в id
@@ -40,7 +40,7 @@ public class FileController {
     }
 
     @RequestMapping(method = RequestMethod.GET, value = "/get-photo")
-    public ResponseEntity<?> getPhoto(@RequestParam("id") String id){
+    public ResponseEntity<?> getPhoto(@RequestParam("id") Long id){
         //TODO для формирования badRequest добавить ControllerAdvice
         var photo = fileService.getPhoto(id);
         if (photo == null) {

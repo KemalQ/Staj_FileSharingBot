@@ -29,22 +29,17 @@ public class FileServiceImplRest implements FileServiceRest {
     }
 
     @Override
-    public AppDocument getDocument(String hash) {//парсим строку в лонг, по лонгу находим док
-        //TODO добавить дешифрование хеш строки
-        var id = cryptoTool.idOf(hash);//чтобы не было самовольного указывания id,
-        if (id == null){
-            return null;
-        }
+    public AppDocument getDocument(Long id) {//парсим строку в лонг, по лонгу находим док
         return appDocumentDAO.findById(id).orElse(null);//и несанкц доступа к докам. других пользв.
     }
 
     @Override
-    public AppPhoto getPhoto(String hash) {//парсим строку в лонг, по лонгу находим фото
+    public AppPhoto getPhoto(Long id) {//парсим строку в лонг, по лонгу находим фото
         //TODO добавить дешифрование хеш строки
-        var id = cryptoTool.idOf(hash);//чтобы не было самовольного указывания id,
-        if (id == null){
-            return null;
-        }
+//        var id = cryptoTool.idOf(hash);//чтобы не было самовольного указывания id,
+//        if (id == null){
+//            return null;
+//        }
         return appPhotoDAO.findById(id).orElse(null);//парсим строку в лонг, по лонгу находим фото
     }
 
