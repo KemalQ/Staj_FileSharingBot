@@ -1,6 +1,7 @@
 package com.staj.staj.Node.service.impl;
 
 import com.staj.staj.Node.exceptions.UploadFileException;
+import com.staj.staj.Node.service.AppUserService;
 import com.staj.staj.Node.service.FileService;
 import com.staj.staj.Node.service.ProducerService;
 import com.staj.staj.Node.dao.RawDataDAO;
@@ -20,7 +21,7 @@ import org.telegram.telegrambots.meta.api.objects.User;
 
 import static com.staj.staj.Node.service.enums.ServiceCommand.*;
 import static com.staj.staj.common_jpa.entity.enums.UserState.BASIC_STATE;
-import static com.staj.staj.common_jpa.entity.enums.UserState.WAIR_FOR_EMAIL_STATE;
+import static com.staj.staj.common_jpa.entity.enums.UserState.WAIT_FOR_EMAIL_STATE;
 
 @Service
 @Slf4j
@@ -29,11 +30,13 @@ public class MainServiceImpl implements MainService {
     private final ProducerService producerService;
     private final AppUserDAO appUserDAO;
     private final FileService fileService;
-    public MainServiceImpl(RawDataDAO rawDataDAO, ProducerService producerService, AppUserDAO appUserDAO, FileService fileService) {
+    private final AppUserService appUserService;
+    public MainServiceImpl(RawDataDAO rawDataDAO, ProducerService producerService, AppUserDAO appUserDAO, FileService fileService, AppUserService appUserService) {
         this.rawDataDAO = rawDataDAO;
         this.producerService = producerService;
         this.appUserDAO = appUserDAO;
         this.fileService = fileService;
+        this.appUserService = appUserService;
     }
 
     @Override
@@ -51,8 +54,9 @@ public class MainServiceImpl implements MainService {
         else if(BASIC_STATE.equals(userState)){
             output = processServiceCommand(appUser, text);
         }
-        else if(WAIR_FOR_EMAIL_STATE.equals(userState)){
+        else if(WAIT_FOR_EMAIL_STATE.equals(userState)){
             //TODO add email processing
+            output = appUserService.setEmail(appUser, text);
         }
         else {
             log.error("Unknown user state: " + userState);
@@ -123,7 +127,7 @@ public class MainServiceImpl implements MainService {
         var serviceCommand = ServiceCommand.fromValue(cmd);
         if (REGISTRATION.equals(serviceCommand)){
             //TODO add registration
-            return "temporary unavailable";
+            return appUserService.registerUser(appUser);
         } else if (HELP.equals(serviceCommand)){
             return help();
         } else if (START.equals(serviceCommand)) {
@@ -152,19 +156,19 @@ public class MainServiceImpl implements MainService {
 
     private AppUser findOrSaveAppUser(Update update){//поиск пользователя в бд, имеет PrimaryKey и связан с сессией Hibernate
         User telegramUser = update.getMessage().getFrom();
-        AppUser persistentAppUser = appUserDAO.findAppUserByTelegramUserId(telegramUser.getId());
-        if(persistentAppUser==null){//если польз. нет сохраняем его
+        var optional = appUserDAO.findByTelegramUserId(telegramUser.getId());
+        if(optional.isEmpty()){//если пользователя нет- сохраняем его
             AppUser transientAppUser = AppUser.builder()
                     .telegramUserId(telegramUser.getId())
                     .userName(telegramUser.getUserName())
                     .firstName(telegramUser.getFirstName())
                     .lastName(telegramUser.getLastName())
                     //TODO изменить значение по умолчанию после добавления регистрации
-                    .isActive(true)
+                    .isActive(false)
                     .state(BASIC_STATE).build();
             return appUserDAO.save(transientAppUser);
         }
-        return persistentAppUser;
+        return optional.get();
     }
     private void saveRawData(Update update) {//storing to hash collection
         RawData rawData = RawData.builder().event(update).build();//из за неправильного импорта в RawData .event не распознается
