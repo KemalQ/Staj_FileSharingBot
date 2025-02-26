@@ -78,7 +78,7 @@ public class MainServiceImpl implements MainService {
         try{
             AppDocument doc = fileService.processDoc(update.getMessage());
             String link = fileService.generateLink(doc.getId(), LinkType.GET_DOC);//Добавил генерацию ссылки для скачивания документа
-            var answer = "Документ успешно загружен! ссыдка для скачивания: " + link;
+            var answer = "Документ успешно загружен! ссылка для скачивания: " + link;
             sendAnswer(answer, chatId);
         } catch (UploadFileException ex) {
             log.error("Ошибка при загрузке файла", ex);

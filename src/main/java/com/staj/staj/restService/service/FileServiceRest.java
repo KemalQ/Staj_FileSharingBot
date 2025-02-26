@@ -8,6 +8,4 @@ import org.springframework.core.io.FileSystemResource;
 public interface FileServiceRest {
     AppDocument getDocument(Long id);//для получения документа
     AppPhoto getPhoto(Long id);//для получения фото
-    FileSystemResource getFileSystemResource(BinaryContent binaryContent);//для преобразования массива byte
-    //в объект FileSystemResource, для передачи контента в телеге в теле ответа
 }

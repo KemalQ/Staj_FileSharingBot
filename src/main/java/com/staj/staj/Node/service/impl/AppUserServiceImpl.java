@@ -49,7 +49,7 @@ public class AppUserServiceImpl implements AppUserService {
             InternetAddress emailAddress = new InternetAddress(email);//созд InternetAddress
             emailAddress.validate();//проверка на соответствие эл адр правильному формату
         } catch (AddressException e) {
-            return "Введите пожалуйста конкретный email. Для отмены команды введите /cancel";
+            return "Введите пожалуйста корретный email. Для отмены команды введите /cancel";
         }
         var optional = appUserDAO.findByEmail(email);//если нет optional=null
         if (optional.isEmpty()) {//если польз. не найден по эл почте в бд
