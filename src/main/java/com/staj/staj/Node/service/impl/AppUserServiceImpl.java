@@ -36,7 +36,7 @@ public class AppUserServiceImpl implements AppUserService {
             return "Вы уже зарегистрированы!";
         } else if (appUser.getEmail() != null){
             return "Вам на почту было отправлено письмо. "
-                    + "Пурейдите по ссылке в письме для пожтверждения регистрации.";
+                    + "Перейдите по ссылке в письме для пожтверждения регистрации.";
         }
         appUser.setState(WAIT_FOR_EMAIL_STATE);
         appUserDAO.save(appUser);
@@ -46,18 +46,18 @@ public class AppUserServiceImpl implements AppUserService {
     @Override
     public String setEmail(AppUser appUser, String email) {
         try {
-            InternetAddress emailAddress = new InternetAddress(email);
-            emailAddress.validate();
+            InternetAddress emailAddress = new InternetAddress(email);//созд InternetAddress
+            emailAddress.validate();//проверка на соответствие эл адр правильному формату
         } catch (AddressException e) {
             return "Введите пожалуйста конкретный email. Для отмены команды введите /cancel";
         }
-        var optional = appUserDAO.findByEmail(email);
-        if (optional.isEmpty()) {
-            appUser.setEmail(email);
+        var optional = appUserDAO.findByEmail(email);//если нет optional=null
+        if (optional.isEmpty()) {//если польз. не найден по эл почте в бд
+            appUser.setEmail(email);//TODO установка эл почты  setEmail здесь это setter из AppUser
             appUser.setState(BASIC_STATE);
             appUser = appUserDAO.save(appUser);
 
-            var cryptoUserId = cryptoTool.hashOf(appUser.getId());
+            var cryptoUserId = cryptoTool.hashOf(appUser.getId());//TODO ошибка возможно изза возвр знач из хеша
             var response = sendRequestToMailService(cryptoUserId, email);
             if (response.getStatusCode() != HttpStatus.OK) {
                 var msg = String.format("Отправка эл. письма на почту %s не удалась.", email);
@@ -75,6 +75,7 @@ public class AppUserServiceImpl implements AppUserService {
         }
     }
     private ResponseEntity<String> sendRequestToMailService(String cryptoUserId, String email) {
+        //отправка HTTP POST запроса к сервису почтовых рассылок
         var restTemplate = new RestTemplate();
         var headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
@@ -83,6 +84,6 @@ public class AppUserServiceImpl implements AppUserService {
                 .emailTo(email)
                 .build();
         var request = new HttpEntity<>(mailParams, headers);
-        return restTemplate.exchange(mailServiceUri, HttpMethod.POST, request, String.class);
+        return restTemplate.exchange(mailServiceUri, HttpMethod.POST, request, String.class);//TODO возм. ощибка в mailServiceUri
     }
 }

@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RequestMapping("/user")
 @RestController
-public class ActivationController {
+public class ActivationController {//обработка запросов по ссылке из письма
     private final UserActivationServiceImpl userActivationService;
 
     public ActivationController(UserActivationServiceImpl userActivationService) {
