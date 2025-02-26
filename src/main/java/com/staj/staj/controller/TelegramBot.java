@@ -51,13 +51,13 @@ public class TelegramBot extends TelegramWebhookBot {
     }
 
     public void sendAnswerMessage(SendMessage message) {
-        if (message != null) {
-            try{
-                execute(message);
-            } catch (TelegramApiException e){
-                log.error(String.valueOf(e));
-            }
-        }
+//        if (message != null) {
+//            try{
+//                execute(message);
+//            } catch (TelegramApiException e){
+//                log.error(String.valueOf(e));
+//            }
+//        }
     }
 
     @Override
