@@ -13,3 +13,6 @@ I also performed load testing of the system using Apache JMeter and analyzed the
 4.Upload content: send a file or photo to the Telegram chat bot.
 
 5.Download content: get a link to an external source to download a file and download it.
+
+
+In the future, I plan to separate Node, MailService, and RestService into separate microservices.
